@@ -1,4 +1,7 @@
 # ReCodEx CLI
+
+[![Build Status](https://travis-ci.org/ReCodEx/cli.svg?branch=master)](https://travis-ci.org/ReCodEx/cli)
+
 Command line interface for ReCodEx submissions running in [Node.js](https://nodejs.org), written in ES6 and compiled using [Babel](https://babeljs.io/).
 
 ## Requirements

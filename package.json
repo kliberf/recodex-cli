@@ -31,6 +31,7 @@
   "devDependencies": {
     "babel-eslint": "^6.1.2",
     "babel-preset-nodejs6": "^1.0.0",
+    "babel-register": "^6.14.0",
     "chai": "^3.5.0",
     "eslint": "^3.5.0",
     "eslint-config-standard": "^6.0.1",
