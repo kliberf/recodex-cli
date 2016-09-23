@@ -1,11 +1,11 @@
 # ReCodEx CLI
-Command line interface for ReCodEx submissions running in Node.js, written in ES6 and compiled using (Babel)[https://babeljs.io/].
+Command line interface for ReCodEx submissions running in [Node.js](https://nodejs.org), written in ES6 and compiled using [Babel](https://babeljs.io/).
 
 ## Requirements
-- (Node.js)[https://nodejs.org] v6
+- [Node.js](https://nodejs.org) v6
 
 ## Installation
-npm install -g recodex-cli
+`npm install -g recodex-cli`
 
 ## Usage
 - the tool is currently in development and no useful stuff is in fact implemented :-)
@@ -19,7 +19,7 @@ npm install -g recodex-cli
 For faster development use the watch mode of build `npm run build:watch`.
 
 ## Testing
-Unit tests are using (Mocha)[https://mochajs.org] and (Chai)[http://chaijs.com] and are locaded in the `/test` directory.
+Unit tests are using [Mocha](https://mochajs.org) and [Chai](http://chaijs.com) and are locaded in the `/test` directory.
 
 ### Running tests
 - linting: `npm run lint`
