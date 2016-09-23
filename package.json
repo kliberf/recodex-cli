@@ -1,6 +1,6 @@
 {
   "name": "recodex-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Command line interface for submitting solutions to ReCodEx.",
   "main": "lib/index.js",
   "scripts": {
