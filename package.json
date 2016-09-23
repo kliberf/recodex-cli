@@ -8,7 +8,7 @@
     "build": "npm run clean && babel -d lib src",
     "build:watch": "npm run clean && babel -d lib src --watch",
     "lint": "eslint .",
-    "test": "mocha tests",
+    "test": "mocha test",
     "start": "node lib/index"
   },
   "repository": {

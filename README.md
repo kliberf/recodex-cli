@@ -19,7 +19,7 @@ npm install -g recodex-cli
 For faster development use the watch mode of build `npm run build:watch`.
 
 ## Testing
-Unit tests are using (Mocha)[https://mochajs.org] and (Chai)[http://chaijs.com] and are locaded in the `/tests` directory.
+Unit tests are using (Mocha)[https://mochajs.org] and (Chai)[http://chaijs.com] and are locaded in the `/test` directory.
 
 ### Running tests
 - linting: `npm run lint`
