@@ -5,7 +5,7 @@ Command line interface for ReCodEx submissions running in Node.js, written in ES
 - (Node.js)[https://nodejs.org] v6
 
 ## Installation
-npm install -g recodex-cli
+`npm install -g recodex-cli`
 
 ## Usage
 - the tool is currently in development and no useful stuff is in fact implemented :-)
