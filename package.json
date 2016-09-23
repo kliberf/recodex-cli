@@ -1,0 +1,44 @@
+{
+  "name": "recodex-cli",
+  "version": "0.1.0",
+  "description": "Command line interface for submitting solutions to ReCodEx.",
+  "main": "lib/index.js",
+  "scripts": {
+    "clean": "rimraf lib",
+    "build": "npm run clean && babel -d lib src",
+    "build:watch": "npm run clean && babel -d lib src --watch",
+    "lint": "eslint .",
+    "test": "mocha tests",
+    "start": "node lib/index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/recodex/cli.git"
+  },
+  "keywords": [
+    "cli",
+    "recodex"
+  ],
+  "author": "Simon Rozsival <simon@rozsival.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/recodex/cli/issues"
+  },
+  "homepage": "https://github.com/recodex/cli#readme",
+  "devDependencies": {
+    "babel-eslint": "^6.1.2",
+    "babel-preset-nodejs6": "^1.0.0",
+    "chai": "^3.5.0",
+    "eslint": "^3.5.0",
+    "eslint-config-standard": "^6.0.1",
+    "eslint-plugin-import": "^1.15.0",
+    "eslint-plugin-promise": "^2.0.1",
+    "eslint-plugin-react": "^6.3.0",
+    "eslint-plugin-standard": "^2.0.0",
+    "mocha": "^3.0.2",
+    "rimraf": "^2.5.4"
+  },
+  "dependencies": {
+    "progress": "^1.1.8"
+  }
+}
