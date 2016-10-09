@@ -40,10 +40,15 @@
     "eslint-plugin-react": "^6.3.0",
     "eslint-plugin-standard": "^2.0.0",
     "mocha": "^3.0.2",
-    "rimraf": "^2.5.4"
+    "rimraf": "^2.5.4",
+    "touch": "^1.0.0"
   },
   "dependencies": {
     "commander": "^2.9.0",
-    "progress": "^1.1.8"
+    "form-data": "^2.1.0",
+    "node-fetch": "^1.6.3",
+    "progress": "^1.1.8",
+    "prompt": "^1.0.0",
+    "statuscode": "0.0.0"
   }
 }
