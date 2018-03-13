@@ -1,0 +1,7 @@
+click
+requests
+ruamel.yaml
+appdirs
+
+bs4
+html2text
