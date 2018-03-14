@@ -22,8 +22,6 @@ setup(name='recodex-cli',
       packages=['recodex',
                 ],
       include_package_data=True,
-      setup_requires=['pytest-runner'],
-      tests_require=['pytest'],
       entry_points={
           'console_scripts':
               ['recodex = recodex.cli:cli'],

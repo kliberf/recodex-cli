@@ -5,7 +5,7 @@
 Command line interface to the ReCodEx system.
 
 ## Requirements
-- Python 3
+- Python 3.6+
 - See `requirements.txt`
 
 ## Installation
@@ -23,6 +23,6 @@ Command line interface to the ReCodEx system.
 Unit tests are using py.test and are located in the `/tests` directory.
 
 ### Running tests
-- unit tests: `python setup.py test`
+- unit tests: `pytest --doctest-modules`
 
 
