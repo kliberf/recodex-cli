@@ -112,7 +112,7 @@ def make_exercise_config(config, content_soup, exercise_files, pipelines, tests,
                     break
 
             if build_pipeline is None:
-                logging.error("No build pipeline found for test %d", test.number)
+                logging.error("No build pipeline found for test %d", int(test.number))
                 break
 
             input_stdio = test.in_type == "stdio"
@@ -139,29 +139,27 @@ def make_exercise_config(config, content_soup, exercise_files, pipelines, tests,
                 test_inputs = ["{}.in".format(test.number)]
                 test_input_names = ["{}.in".format(test.number)]
 
-            variables = [
-                {
-                    "name": "input-files" if not input_stdio else "input-file",
-                    "type": "remote-file[]" if not input_stdio else "remote-file",
-                    "value": test_inputs
-                },
-                {
-                    "name": "judge-type",
-                    "type": "string",
-                    "value": config.judges.get(test.judge, test.judge)
-                },
-                {
-                    "name": "run-args",
-                    "type": "string[]",
-                    "value": convert_args(test)
-                }
-            ]
-
-            variables.append({
+            variables = [{
+                "name": "stdin-file",
+                "type": "remote-file",
+                "value": test_inputs[0]
+            }, {
+                "name": "input-files",
+                "type": "remote-file[]",
+                "value": test_inputs
+            }, {
+                "name": "judge-type",
+                "type": "string",
+                "value": config.judges.get(test.judge, test.judge)
+            }, {
+                "name": "run-args",
+                "type": "string[]",
+                "value": convert_args(test)
+            }, {
                 "name": "stdin-file",
                 "type": "remote-file",
                 "value": test_inputs[0] if input_stdio else ""
-            })
+            }, ]
 
             if "$TDIR/$TEST.ok" in test.judge_args:
                 variables.append({
@@ -210,12 +208,11 @@ def make_exercise_config(config, content_soup, exercise_files, pipelines, tests,
                 "value": convert_args(test)
             })
 
-            if not input_stdio:
-                variables.append({
-                    "name": "actual-inputs",
-                    "type": "file[]",
-                    "value": test_input_names
-                })
+            variables.append({
+                "name": "actual-inputs",
+                "type": "file[]",
+                "value": test_input_names
+            })
 
             if not output_stdio:
                 variables.append({
@@ -229,7 +226,15 @@ def make_exercise_config(config, content_soup, exercise_files, pipelines, tests,
                 "pipelines": [
                     {
                         "name": build_pipeline,
-                        "variables": []
+                        "variables": [{
+                            "name": "extra-files",
+                            "type": "remote-file[]",
+                            "value": []
+                        }, {
+                            "name": "extra-file-names",
+                            "type": "file[]",
+                            "value": []
+                        }]
                     },
                     {
                         "name": exec_pipeline,

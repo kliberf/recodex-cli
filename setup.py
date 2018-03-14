@@ -28,6 +28,6 @@ setup(name='recodex-cli',
           'console_scripts':
               ['recodex = recodex.cli:cli'],
           'recodex':
-              ['codex-import = recodex.plugins.codex_import.cli:cli']
+              ['codex = recodex.plugins.codex.cli:cli']
       }
 )

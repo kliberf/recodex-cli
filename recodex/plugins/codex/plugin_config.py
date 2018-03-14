@@ -8,11 +8,11 @@ class Config(NamedTuple):
     locale: str = "cs"
 
     extension_to_runtime: Dict[str, str] = {
-        "cs": "mono46",
+        "cs": "mono",
         "c": "c-gcc-linux",
         "pas": "freepascal-linux",
-        "java": "java8",
-        "cpp": "cxx11-gcc-linux"
+        "java": "java",
+        "cpp": "cxx-gcc-linux"
     }
 
     judges: Dict[str, str] = {
@@ -23,5 +23,8 @@ class Config(NamedTuple):
 
     @classmethod
     def load(cls, config_path: Path):
+        if not config_path.exists():
+            return cls()
+
         config = yaml.safe_load(config_path.open("r"))
         return cls(**config)

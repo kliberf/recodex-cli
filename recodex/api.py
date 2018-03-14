@@ -74,7 +74,7 @@ class ApiClient:
         self.post('/exercises/{}'.format(exercise_id), data=details)
 
     def create_reference_solution(self, exercise_id, data):
-        return self.post('/reference-solutions/exercise/{}'.format(exercise_id), data=data)
+        return self.post('/reference-solutions/exercise/{}/submit'.format(exercise_id), data=data)
 
     def update_environment_configs(self, exercise_id, configs):
         self.post("/exercises/{}/environment-configs".format(exercise_id), data={
@@ -90,11 +90,15 @@ class ApiClient:
     def get_exercise_tests(self, exercise_id):
         return self.get("/exercises/{}/tests".format(exercise_id))
 
-    def update_limits(self, exercise_id, environment_id, limits):
-        self.post("/exercises/{}/environment/{}/limits".format(exercise_id, environment_id), data={"limits": limits})
+    def update_limits(self, exercise_id, environment_id, hwgroup_id, limits):
+        self.post("/exercises/{}/environment/{}/hwgroup/{}/limits".format(exercise_id, environment_id, hwgroup_id),
+                  data={"limits": limits})
 
     def evaluate_reference_solutions(self, exercise_id):
         self.post("/reference-solutions/exercise/{}/evaluate".format(exercise_id), data={})
+
+    def get_hwgroups(self):
+        return self.get("/hardware-groups")
 
     @staticmethod
     def extract_payload(response):

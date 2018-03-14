@@ -27,7 +27,8 @@ def cli():
 
 @cli.command()
 @click.argument("exercise_folder")
-def details(exercise_folder):
+@pass_api_client
+def details(api: ApiClient, exercise_folder):
     soup = load_content(exercise_folder)
 
     print("### Exercise details")
@@ -39,7 +40,6 @@ def details(exercise_folder):
     print()
 
     config = Config.load(Path.cwd() / "import-config.yml")
-    api = ApiClient(config.api_url, config.api_token)
     tests = load_codex_test_config(Path(exercise_folder) / "testdata" / "config")
     test_id_map = {test.name: test.number for test in tests}
     files = []
@@ -171,14 +171,14 @@ def check_rs_evaluations(api: ApiClient, threshold):
                 logging.error("Exercise %s has never had any successful evaluations", exercise["id"])
 
 
-@cli.command()
-@click.option("config_path", "-c")
+@cli.command(name="import")
 @click.option("exercise_id", "-e")
-@click.argument("exercise_folder")
 @click.option("group_id", "-g")
+@click.option("hwgroup_id", "-w")
+@click.argument("exercise_folder")
 @pass_api_client
 @pass_config_dir
-def run(config_dir: Path, api: ApiClient, exercise_folder, group_id, exercise_id=None):
+def run_import(config_dir: Path, api: ApiClient, exercise_folder, group_id, exercise_id=None, hwgroup_id=None):
     logging.basicConfig(level=logging.INFO)
 
     config = Config.load(config_dir / "codex_import.yml")
@@ -239,14 +239,6 @@ def run(config_dir: Path, api: ApiClient, exercise_folder, group_id, exercise_id
     api.add_exercise_files(exercise_id, [data["id"] for data in exercise_file_data.values()])
     logging.info("Uploaded exercise files associated with the exercise")
 
-    # Upload reference solutions
-    for solution_id, solution in load_reference_solution_details(content_soup, config.extension_to_runtime):
-        path = load_reference_solution_file(solution_id, content_soup, exercise_folder)
-        solution["files"] = [upload_file(api, path)["id"]]
-        payload = api.create_reference_solution(exercise_id, solution)
-
-        logging.info("New reference solution created, with id %s", payload["id"])
-
     # Configure environments
     extensions = list(load_allowed_extensions(content_soup))
     environments = [config.extension_to_runtime[ext] for ext in extensions]
@@ -294,6 +286,9 @@ def run(config_dir: Path, api: ApiClient, exercise_folder, group_id, exercise_id
     logging.info("Exercise config updated")
 
     # Configure test limits
+    if hwgroup_id is None:
+        hwgroup_id = api.get_hwgroups()[0]['id']
+
     for extension, environment_id in zip(extensions, environments):
         limits_config = {}
 
@@ -304,8 +299,13 @@ def run(config_dir: Path, api: ApiClient, exercise_folder, group_id, exercise_id
                 "memory": test.limits[key].mem_limit
             }
 
-        api.update_limits(exercise_id, environment_id, limits_config)
+        api.update_limits(exercise_id, environment_id, hwgroup_id, limits_config)
         logging.info("Limits set for environment %s", environment_id)
 
-    api.evaluate_reference_solutions(exercise_id)
-    logging.info("Requested an evaluation of reference solutions")
+    # Upload reference solutions
+    for solution_id, solution in load_reference_solution_details(content_soup, config.extension_to_runtime):
+        path = load_reference_solution_file(solution_id, content_soup, exercise_folder)
+        solution["files"] = [upload_file(api, path)["id"]]
+        payload = api.create_reference_solution(exercise_id, solution)
+
+        logging.info("New reference solution created, with id %s", payload["referenceSolution"]["id"])
