@@ -14,4 +14,5 @@ class UserContext(NamedTuple):
         return cls(**config)
 
     def store(self, config_path: Path):
+        config_path.parent.mkdir(parents=True, exist_ok=True)
         yaml.dump(dict(self._asdict()), config_path.open("w"))
