@@ -1,7 +1,7 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name='recodex-cli',
-      version='0.0.1',
+      version='0.0.3',
       description='ReCodEx CLI',
       long_description='A command line frontend to the ReCodEx programmer evaluation system',
       classifiers=[
@@ -18,9 +18,10 @@ setup(name='recodex-cli',
       url='https://github.com/ReCodEx/cli',
       author='ReCodEx team',
       license='MIT',
-      packages=['recodex',
-                ],
+      packages=find_packages("."),
       include_package_data=True,
+      python_requires='>=3.6',
+      install_requires=['click', 'requests', 'appdirs', 'ruamel.yaml', 'bs4', 'lxml', 'html2text'],
       entry_points={
           'console_scripts':
               ['recodex = recodex.cli:cli'],
