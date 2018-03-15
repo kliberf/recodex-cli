@@ -12,7 +12,8 @@ class Config(NamedTuple):
         "c": "c-gcc-linux",
         "pas": "freepascal-linux",
         "java": "java",
-        "cpp": "cxx-gcc-linux"
+        "cpp": "cxx-gcc-linux",
+        "py": "python3"
     }
 
     judges: Dict[str, str] = {
