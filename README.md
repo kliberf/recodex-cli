@@ -23,6 +23,6 @@ Command line interface to the ReCodEx system.
 Unit tests are using py.test and are located in the `/tests` directory.
 
 ### Running tests
-- unit tests: `pytest --doctest-modules`
+- unit tests: `pytest`
 
 
