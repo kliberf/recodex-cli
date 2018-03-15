@@ -142,7 +142,7 @@ def make_exercise_config(config, content_soup, exercise_files, pipelines, tests,
             variables = [{
                 "name": "stdin-file",
                 "type": "remote-file",
-                "value": test_inputs[0]
+                "value": test_inputs[0] if test_inputs else ""
             }, {
                 "name": "input-files",
                 "type": "remote-file[]",
