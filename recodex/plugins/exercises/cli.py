@@ -85,3 +85,10 @@ def check_rs_evaluations(api: ApiClient, threshold):
                 logging.error("Exercise %s has no recent successful evaluations", exercise["id"])
             else:
                 logging.error("Exercise %s has never had any successful evaluations", exercise["id"])
+
+
+@cli.command()
+@click.argument("exercise_id")
+@pass_api_client
+def delete(api: ApiClient, exercise_id):
+    api.delete_exercise(exercise_id)

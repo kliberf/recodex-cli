@@ -23,6 +23,9 @@ class ApiClient:
     def get(self, url):
         return self.extract_payload(self.call("get", url))
 
+    def delete(self, url):
+        return self.extract_payload(self.call("delete", url))
+
     def get_status(self):
         return self.call("get", "").json()
 
@@ -72,6 +75,9 @@ class ApiClient:
 
     def update_exercise(self, exercise_id, details):
         self.post('/exercises/{}'.format(exercise_id), data=details)
+
+    def delete_exercise(self, exercise_id):
+        self.delete('/exercises/{}'.format(exercise_id))
 
     def create_reference_solution(self, exercise_id, data):
         return self.post('/reference-solutions/exercise/{}/submit'.format(exercise_id), data=data)
