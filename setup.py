@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='recodex-cli',
-      version='0.0.5',
+      version='0.0.6',
       description='ReCodEx CLI',
       long_description='A command line frontend to the ReCodEx programmer evaluation system',
       classifiers=[
@@ -21,7 +21,7 @@ setup(name='recodex-cli',
       packages=find_packages("."),
       include_package_data=True,
       python_requires='>=3.6',
-      install_requires=['click', 'requests', 'appdirs', 'ruamel.yaml', 'bs4', 'lxml', 'html2text'],
+      install_requires=['click', 'requests', 'appdirs', 'ruamel.yaml', 'bs4', 'lxml', 'html2text', 'pyjwt'],
       entry_points={
           'console_scripts':
               ['recodex = recodex.cli:cli'],
@@ -29,7 +29,9 @@ setup(name='recodex-cli',
               'codex = recodex.plugins.codex.cli:cli',
               'exercises = recodex.plugins.exercises.cli:cli',
               'caslogin = recodex.plugins.caslogin.cli:caslogin',
-              'login = recodex.plugins.login.cli:login'
+              'login = recodex.plugins.login.cli:login',
+              'takeover = recodex.plugins.takeover.cli:takeover',
+              'users = recodex.plugins.users.cli:cli'
           ]
       }
 )

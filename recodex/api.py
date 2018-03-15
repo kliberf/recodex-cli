@@ -115,6 +115,15 @@ class ApiClient:
     def login_external(self, service_id, auth_type, credentials):
         return self.post("/login/{}/{}".format(service_id, auth_type), data=credentials)
 
+    def takeover(self, user_id):
+        return self.post("/login/takeover/{}".format(user_id))
+
+    def get_user(self, user_id):
+        return self.get("/users/{}".format(user_id))
+
+    def search_users(self, instance_id, search_string):
+        return self.get("/instances/{}/users?search={}".format(instance_id, search_string))
+
     @staticmethod
     def extract_payload(response):
         try:

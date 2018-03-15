@@ -3,6 +3,7 @@ from pprint import pprint
 
 import appdirs
 import click
+import jwt
 import pkg_resources
 import sys
 from pathlib import Path
@@ -28,7 +29,8 @@ def cli(ctx: click.Context):
     ctx.obj = ReCodExContext(
         ApiClient(user_context.api_url, user_context.api_token),
         config_dir,
-        data_dir
+        data_dir,
+        user_context
     )
 
 
@@ -59,6 +61,33 @@ def init(data_dir: Path, api_url):
 
     data_dir.mkdir(parents=True, exist_ok=True)
     context.store(data_dir / "context.yaml")
+
+
+@cli.command()
+@pass_data_dir
+@pass_api_client
+def status(api: ApiClient, data_dir: Path):
+    context = UserContext.load(data_dir / "context.yaml")
+
+    if context.api_token is None:
+        print("No token is configured")
+        sys.exit()
+
+    if context.api_url is None:
+        print("No API URL is configured")
+        sys.exit()
+
+    click.echo("API URL: {}".format(context.api_url))
+
+    try:
+        jwt.decode(context.api_token)
+    except jwt.exceptions.InvalidSignatureError:
+        click.echo("Token signature is invalid", err=True)
+
+    click.echo("User ID: {}".format(context.user_id))
+
+    user_data = api.get_user(context.user_id)
+    click.echo("User name: {}".format(user_data["fullName"]))
 
 
 @cli.command()

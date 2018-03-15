@@ -2,6 +2,7 @@ click
 requests
 ruamel.yaml
 appdirs
+pyjwt
 
 bs4
 lxml
