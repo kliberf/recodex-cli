@@ -100,6 +100,15 @@ class ApiClient:
     def get_hwgroups(self):
         return self.get("/hardware-groups")
 
+    def login(self, username, password):
+        return self.post("/login", data={
+            "username": username,
+            "password": password
+        })
+
+    def login_external(self, service_id, auth_type, credentials):
+        return self.post("/login/{}/{}".format(service_id, auth_type), data=credentials)
+
     @staticmethod
     def extract_payload(response):
         try:

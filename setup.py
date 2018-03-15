@@ -12,7 +12,6 @@ setup(name='recodex-cli',
           'Operating System :: Unix',
           'Programming Language :: Python :: Implementation :: CPython',
           'License :: OSI Approved :: MIT License',
-          'Programming Language :: Python :: 3.5',
           'Programming Language :: Python :: 3.6'
       ],
       keywords='recodex',
@@ -27,7 +26,9 @@ setup(name='recodex-cli',
               ['recodex = recodex.cli:cli'],
           'recodex': [
               'codex = recodex.plugins.codex.cli:cli',
-              'exercises = recodex.plugins.exercises.cli:cli'
+              'exercises = recodex.plugins.exercises.cli:cli',
+              'caslogin = recodex.plugins.caslogin.cli:caslogin',
+              'login = recodex.plugins.login.cli:login'
           ]
       }
 )
