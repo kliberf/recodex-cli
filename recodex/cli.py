@@ -78,12 +78,6 @@ def status(api: ApiClient, data_dir: Path):
         sys.exit()
 
     click.echo("API URL: {}".format(context.api_url))
-
-    try:
-        jwt.decode(context.api_token)
-    except jwt.exceptions.InvalidSignatureError:
-        click.echo("Token signature is invalid", err=True)
-
     click.echo("User ID: {}".format(context.user_id))
 
     user_data = api.get_user(context.user_id)
