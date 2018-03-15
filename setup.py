@@ -25,7 +25,9 @@ setup(name='recodex-cli',
       entry_points={
           'console_scripts':
               ['recodex = recodex.cli:cli'],
-          'recodex':
-              ['codex = recodex.plugins.codex.cli:cli']
+          'recodex': [
+              'codex = recodex.plugins.codex.cli:cli',
+              'exercises = recodex.plugins.exercises.cli:cli'
+          ]
       }
 )

@@ -2,25 +2,20 @@ import click
 import logging
 from pprint import pprint
 from pathlib import Path
-from datetime import datetime, timedelta
-import sys
-
-from html2text import html2text
-from ruamel import yaml
 
 from recodex.decorators import pass_config_dir, pass_api_client
+from recodex.api import ApiClient
 from .codex_config import load_codex_test_config
 from .plugin_config import Config
 from .utils import load_details, load_active_text, load_exercise_files, make_exercise_config, load_content, \
     load_additional_files, load_allowed_extensions, load_reference_solution_details, get_custom_judges, \
     load_reference_solution_file, replace_file_references, upload_file
-from recodex.api import ApiClient
 
 
 @click.group()
 def cli():
     """
-    Import exercises from CodEx
+    Tools for working with legacy CodEx exercises (and importing them)
     """
     pass
 
@@ -77,6 +72,10 @@ def has_dir_test(exercise_folder):
 @click.argument("exercise_folder", nargs=-1)
 @pass_api_client
 def get_id(api: ApiClient, exercise_folder):
+    """
+    Look up an imported exercise in the API and print its ID
+    """
+
     exercises = api.get_exercises()
 
     for folder in exercise_folder:
@@ -94,20 +93,6 @@ def get_id(api: ApiClient, exercise_folder):
 
 
 @cli.command()
-@click.argument("language")
-@click.argument("exercise_id")
-@pass_api_client
-def add_localization(api:ApiClient, language, exercise_id):
-    exercise = api.get_exercise(exercise_id)
-    exercise["localizedTexts"].append({
-        "locale": language,
-        "text": html2text(sys.stdin.read())
-    })
-
-    api.update_exercise(exercise_id, exercise)
-
-
-@cli.command()
 @click.option("exercise_id", "-e")
 @click.argument("exercise_folder")
 @pass_api_client
@@ -116,59 +101,6 @@ def set_score_config(api: ApiClient, exercise_id, exercise_folder):
 
     score_config = {test.name: int(test.points) for test in tests}
     api.set_exercise_score_config(exercise_id, yaml.dump({"testWeights": score_config}, default_flow_style=False))
-
-
-@cli.command()
-@click.option("config_path", "-c")
-@pass_api_client
-def evaluate_all_rs(api: ApiClient):
-    """
-    Request evaluation for all reference solutions
-    """
-    with click.progressbar(api.get_exercises()) as bar:
-        for exercise in bar:
-            try:
-                api.evaluate_reference_solutions(exercise["id"])
-            except Exception as e:
-                logging.error("Error in exercise {}: {}".format(exercise["id"], str(e)))
-
-
-@cli.command()
-@click.option("threshold", "-t")
-@pass_api_client
-def check_rs_evaluations(api: ApiClient, threshold):
-    """
-    Find exercises that had no successful reference solution evaluation in
-    a given number of days
-    """
-    for exercise in api.get_exercises():
-        solutions = api.get_reference_solutions(exercise["id"])
-        if not solutions:
-            logging.error("Exercise %s has no reference solutions", exercise["id"])
-            continue
-
-        found = False
-        found_recent = False
-
-        for solution in solutions:
-            for evaluation in api.get_reference_solution_evaluations(solution["id"]):
-                status_ok = evaluation["evaluationStatus"] == "done"
-                submission_timestamp = int(evaluation["submittedAt"])
-                submission_timestamp = max(0, submission_timestamp)
-                submission_date = datetime.fromtimestamp(submission_timestamp)
-                threshold_date = datetime.utcnow() - timedelta(days=int(threshold))
-                recent = submission_date >= threshold_date
-                if status_ok:
-                    found = True
-                    if recent:
-                        found_recent = True
-                        break
-
-        if not found_recent:
-            if found:
-                logging.error("Exercise %s has no recent successful evaluations", exercise["id"])
-            else:
-                logging.error("Exercise %s has never had any successful evaluations", exercise["id"])
 
 
 @cli.command(name="import")
