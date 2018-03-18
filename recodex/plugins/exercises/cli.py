@@ -35,6 +35,22 @@ def add_localization(api: ApiClient, language, exercise_id):
 
 
 @cli.command()
+@click.argument("files", nargs=-1)
+@click.option("exercise_id", "-e")
+@click.option("note", "-n", default="")
+@click.option("runtime_environment", "-r", required=True)
+@pass_api_client
+def add_reference_solution(api: ApiClient, exercise_id, note, runtime_environment, files):
+    solution = api.create_reference_solution(exercise_id, {
+        "note": note,
+        "runtimeEnvironmentId": runtime_environment,
+        "files": [api.upload_file(file, open(file, "r")) for file in files]
+    })
+    
+    click.echo(solution["id"])
+
+
+@cli.command()
 @click.option("config_path", "-c")
 @pass_api_client
 def evaluate_all_rs(api: ApiClient):
