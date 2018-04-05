@@ -118,6 +118,9 @@ class ApiClient:
     def takeover(self, user_id):
         return self.post("/login/takeover/{}".format(user_id))
 
+    def refresh_token(self):
+        return self.post("/login/refresh")["accessToken"]
+
     def get_user(self, user_id):
         return self.get("/users/{}".format(user_id))
 

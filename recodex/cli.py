@@ -3,7 +3,6 @@ from pprint import pprint
 
 import appdirs
 import click
-import jwt
 import pkg_resources
 import sys
 from pathlib import Path
@@ -25,9 +24,14 @@ def cli(ctx: click.Context):
 
     context_path = data_dir / "context.yaml"
     user_context = UserContext.load(context_path) if context_path.exists() else UserContext()
+    api_client = ApiClient(user_context.api_url, user_context.api_token)
+
+    if user_context.api_token is not None and user_context.is_token_almost_expired() and not user_context.is_token_expired:
+        user_context = user_context.replace_token(api_client.refresh_token())
+        user_context.store(context_path)
 
     ctx.obj = ReCodExContext(
-        ApiClient(user_context.api_url, user_context.api_token),
+        api_client,
         config_dir,
         data_dir,
         user_context
@@ -70,15 +74,19 @@ def status(api: ApiClient, data_dir: Path):
     context = UserContext.load(data_dir / "context.yaml")
 
     if context.api_token is None:
-        print("No token is configured")
+        click.echo("No token is configured", err=True)
         sys.exit()
 
     if context.api_url is None:
-        print("No API URL is configured")
+        click.echo("No API URL is configured", err=True)
         sys.exit()
 
     click.echo("API URL: {}".format(context.api_url))
     click.echo("User ID: {}".format(context.user_id))
+
+    if context.is_token_expired:
+        click.echo("The token is expired", err=True)
+        sys.exit()
 
     user_data = api.get_user(context.user_id)
     click.echo("User name: {}".format(user_data["fullName"]))

@@ -3,7 +3,7 @@ from functools import lru_cache
 import jwt
 from ruamel import yaml
 from typing import NamedTuple, Optional
-
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -22,6 +22,24 @@ class UserContext(NamedTuple):
     @property
     def user_id(self):
         return self.token_data["sub"]
+
+    def is_token_almost_expired(self, threshold=0.5) -> bool:
+        """
+        Returns true if the token is about to expire
+        :param threshold: A number between 0 and 1. If less than (threshold * token validity period) is left until
+                          expiration, the method will return True.
+        """
+
+        validity_period = self.token_data["exp"] - self.token_data["iat"]
+        time_until_expiration = self.token_data["exp"] - datetime.now(timezone.utc).timestamp()
+        return validity_period * threshold > time_until_expiration
+
+    @property
+    def is_token_expired(self) -> bool:
+        return self.token_data["exp"] <= datetime.now(timezone.utc).timestamp()
+
+    def replace_token(self, new_token) -> 'UserContext':
+        return self._replace(api_token=new_token)
 
     @classmethod
     def load(cls, config_path: Path):
