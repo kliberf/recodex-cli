@@ -26,6 +26,7 @@ setup(name='recodex-cli',
           'console_scripts':
               ['recodex = recodex.cli:cli'],
           'recodex': [
+              'assignments = recodex.plugins.assignments.cli:cli',
               'codex = recodex.plugins.codex.cli:cli',
               'exercises = recodex.plugins.exercises.cli:cli',
               'caslogin = recodex.plugins.caslogin.cli:caslogin',
