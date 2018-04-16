@@ -2,6 +2,7 @@ import click
 import unicodedata
 import os
 import datetime
+import json
 
 from recodex.api import ApiClient
 from recodex.decorators import pass_api_client
@@ -42,32 +43,23 @@ def download_best_solutions(api: ApiClient, download_dir, assignment_id):
         click.echo("Download path '{}' must exist and must be a directory.".format(download_dir))
         return
 
+    # Get assignment metadata and best solution for each student ...
     assignment = api.get_assignment(assignment_id)
     if assignment is None:
         click.echo("Assignment not found.")
         return
     click.echo("Downloading best solutions of '{}' to '{}' ...".format(assignment["name"], download_dir))
-    deadline = assignment["secondDeadline"] if assignment["allowSecondDeadline"] else assignment["firstDeadline"]
+    best_solutions = api.get_assignment_best_solutions(assignment_id)
 
-    group_id = assignment["groupId"]
-    for student in api.get_group_students(group_id):
-        best = None
-        solutions = api.get_user_solutions(assignment_id, student["id"])
-        for solution in filter(lambda s: s["solution"]["createdAt"] <= deadline, solutions):
-            if best is None:
-                best = solution
-                continue
-            if solution["accepted"]:
-                best = solution
-                break
-            if safe_get_solution_points(solution) < safe_get_solution_points(best):
-                continue
-            if safe_get_solution_points(solution) == safe_get_solution_points(best) and solution["solution"]["createdAt"] < best["solution"]["createdAt"]:
-                continue
-            best = solution
-
-        if best is not None:
-            file_name = "{}-{}-{}.zip".format(asciiize_string(student["name"]["firstName"]), asciiize_string(student["name"]["lastName"]), student["id"])
+    # Iterate over students
+    for student in api.get_group_students(assignment["groupId"]):
+        # Try to find best solution for the student
+        best = best_solutions[student["id"]]
+        if best:
+            # File name comprise user name in plain ASCII and its ID for uniqueness
+            file_name = "{}-{}-{}.zip".format(
+                asciiize_string(student["name"]["lastName"]),
+                asciiize_string(student["name"]["firstName"]), student["id"])
             points = safe_get_solution_points(best)
             created = datetime.datetime.fromtimestamp(best["solution"]["createdAt"]).strftime('%Y-%m-%d %H:%M:%S')
             click.echo("Saving {} ... {} points, {}".format(file_name, points, created))
