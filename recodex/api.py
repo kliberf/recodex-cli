@@ -11,17 +11,28 @@ class ApiClient:
         if api_token is not None:
             self.headers["Authorization"] = "Bearer " + api_token
 
-    def call(self, method, url, files={}, data={}):
+    def call(self, method, url, files={}, data={}, stream=False):
         if self.api_url is None:
             raise RuntimeError("The API URL is not configured")
 
-        return requests.request(method, self.api_url + "/v1/" + url, files=files, json=data, headers=self.headers)
+        return requests.request(method, self.api_url + "/v1/" + url, files=files, json=data, headers=self.headers, stream=stream)
 
     def post(self, url, files={}, data={}):
         return self.extract_payload(self.call("post", url, files, data))
 
     def get(self, url):
         return self.extract_payload(self.call("get", url))
+
+    def download(self, url, file_name):
+        try:
+            r = self.call("get", url, stream=True)
+            with open(file_name, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=1024):
+                    if chunk:   # filter out keep-alive new chunks
+                        f.write(chunk)
+        except:
+            logging.error("Downloading file {} failed ...".format(url))
+            raise RuntimeError("Downloading file failed")
 
     def delete(self, url):
         return self.extract_payload(self.call("delete", url))
@@ -126,6 +137,22 @@ class ApiClient:
 
     def search_users(self, instance_id, search_string):
         return self.get("/instances/{}/users?search={}".format(instance_id, search_string))
+
+    def get_assignment(self, assignment_id):
+        return self.get("/exercise-assignments/{}".format(assignment_id))
+
+    def get_assignment_best_solutions(self, assignment_id):
+        return self.get("/exercise-assignments/{}/best-solutions".format(assignment_id))
+
+    def get_group_students(self, group_id):
+        return self.get("/groups/{}/students".format(group_id))
+
+    def get_user_solutions(self, assignment_id, user_id):
+        return self.get("/exercise-assignments/{}/users/{}/solutions".format(assignment_id, user_id))
+
+    def download_solution(self, solution_id, file_name):
+        return self.download("/assignment-solutions/{}/download-solution".format(solution_id), file_name)
+
 
     @staticmethod
     def extract_payload(response):

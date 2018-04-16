@@ -19,6 +19,8 @@ See `recodex --help` after installation.
 2. install dependencies using `pip install -r requirements.txt` in the root 
    directory of the repository
 
+The package can be installed locally using `pip install -e` for the development.
+
 ### Writing plugins
 
 The CLI is easy to extend with plugins. This way, you can add subcommands to the `recodex` command without touching the 

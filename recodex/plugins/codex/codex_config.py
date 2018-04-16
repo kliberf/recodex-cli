@@ -1,9 +1,11 @@
 import re
 
+
 class TestLimits:
     def __init__(self):
         self.time_limit = ''
         self.mem_limit = ''
+
 
 class JobTest:
     def __init__(self, number):
@@ -55,6 +57,7 @@ class JobTest:
             output += "\n\t{}\t- time_limit: {}, mem_limit: {}"\
                 .format(limit_group, self.limits[limit_group].time_limit, self.limits[limit_group].mem_limit)
         return output
+
 
 def load_codex_test_config(path):
     lines = (line.strip().replace("'", "").split('=', 1) for line in path.open("r") if line.strip() and not line.startswith('#'))
