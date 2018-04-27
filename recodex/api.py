@@ -135,6 +135,9 @@ class ApiClient:
     def get_user(self, user_id):
         return self.get("/users/{}".format(user_id))
 
+    def update_user(self, user_id, user_data):
+        return self.post("/users/{}".format(user_id), data=user_data)
+
     def search_users(self, instance_id, search_string):
         return self.get("/instances/{}/users?search={}".format(instance_id, search_string))
 
