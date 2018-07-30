@@ -11,6 +11,8 @@ class ApiClient:
         if api_token is not None:
             self.headers["Authorization"] = "Bearer " + api_token
 
+    # Internal
+
     def call(self, method, url, files={}, data={}, stream=False):
         if self.api_url is None:
             raise RuntimeError("The API URL is not configured")
@@ -30,7 +32,7 @@ class ApiClient:
                 for chunk in r.iter_content(chunk_size=1024):
                     if chunk:   # filter out keep-alive new chunks
                         f.write(chunk)
-        except:
+        except Exception:
             logging.error("Downloading file {} failed ...".format(url))
             raise RuntimeError("Downloading file failed")
 
@@ -39,6 +41,8 @@ class ApiClient:
 
     def get_status(self):
         return self.call("get", "").json()
+
+    # Exercises and related stuff
 
     def get_runtime_environments(self):
         return self.get("/runtime-environments")
@@ -117,6 +121,8 @@ class ApiClient:
     def get_hwgroups(self):
         return self.get("/hardware-groups")
 
+    # Authentication
+
     def login(self, username, password):
         return self.post("/login", data={
             "username": username,
@@ -132,17 +138,41 @@ class ApiClient:
     def refresh_token(self):
         return self.post("/login/refresh")["accessToken"]
 
+    # Users
+
     def get_user(self, user_id):
         return self.get("/users/{}".format(user_id))
 
+    def update_user(self, user_id, user_data):
+        return self.post("/users/{}".format(user_id), data=user_data)
+
     def search_users(self, instance_id, search_string):
-        return self.get("/instances/{}/users?search={}".format(instance_id, search_string))
+        return self.get("/users/?filters[instanceId]={}&filters[search]={}".format(instance_id, search_string))["items"]
+
+    def register_user(self, instance_id, email, first_name, last_name, password):
+        return self.post("/users", data={
+            'email': email,
+            'firstName': first_name,
+            'lastName': last_name,
+            'password': password,
+            'passwordConfirm': password,
+            'instanceId': instance_id
+        })
+
+    # Groups
+
+    def group_add_student(self, group_id, user_id):
+        return self.post("/groups/{}/students/{}".format(group_id, user_id))
+
+    # Assignments
 
     def get_assignment(self, assignment_id):
         return self.get("/exercise-assignments/{}".format(assignment_id))
 
     def get_assignment_best_solutions(self, assignment_id):
         return self.get("/exercise-assignments/{}/best-solutions".format(assignment_id))
+
+    # Misc
 
     def get_group_students(self, group_id):
         return self.get("/groups/{}/students".format(group_id))
@@ -152,7 +182,6 @@ class ApiClient:
 
     def download_solution(self, solution_id, file_name):
         return self.download("/assignment-solutions/{}/download-solution".format(solution_id), file_name)
-
 
     @staticmethod
     def extract_payload(response):
@@ -167,4 +196,3 @@ class ApiClient:
             raise RuntimeError("Received error from API: " + json["msg"])
 
         return json["payload"]
-
