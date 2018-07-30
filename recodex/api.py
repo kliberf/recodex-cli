@@ -139,7 +139,7 @@ class ApiClient:
         return self.post("/users/{}".format(user_id), data=user_data)
 
     def search_users(self, instance_id, search_string):
-        return self.get("/instances/{}/users?search={}".format(instance_id, search_string))
+        return self.get("/users/?filters[instanceId]={}&filters[search]={}".format(instance_id, search_string))["items"]
 
     def get_assignment(self, assignment_id):
         return self.get("/exercise-assignments/{}".format(assignment_id))
