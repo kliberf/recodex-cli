@@ -22,6 +22,20 @@ def safe_get_solution_points(solution):
     return evaluation["points"] + solution["bonusPoints"]
 
 
+def getAssignmentName(assignment):
+    if "localizedTexts" not in assignment or len(assignment["localizedTexts"]) == 0:
+        # There is no "localizedTexts" key or empty array :(
+        return "unknown"
+    known_languages = ("en", "cs")
+    # Try known languages (in given order)
+    for lang in known_languages:
+        for item in assignment["localizedTexts"]:
+            if item["locale"] == lang:
+                return item["name"]
+    # Something weird happened, return first name we got
+    return assignment["localizedTexts"][0]["name"]
+
+
 @click.group()
 def cli():
     """
@@ -48,7 +62,8 @@ def download_best_solutions(api: ApiClient, download_dir, assignment_id):
     if assignment is None:
         click.echo("Assignment not found.")
         return
-    click.echo("Downloading best solutions of '{}' to '{}' ...".format(assignment["name"], download_dir))
+    click.echo("Downloading best solutions of '{}' to '{}' ...".format(
+        getAssignmentName(assignment), download_dir))
     best_solutions = api.get_assignment_best_solutions(assignment_id)
 
     # Iterate over students
