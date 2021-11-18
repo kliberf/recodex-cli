@@ -17,7 +17,7 @@ class UserContext(NamedTuple):
         if self.api_token is None:
             raise RuntimeError("The API token is not set")
 
-        return jwt.decode(self.api_token, verify=False)
+        return jwt.decode(self.api_token, options={"verify_signature": False})
 
     @property
     def user_id(self):

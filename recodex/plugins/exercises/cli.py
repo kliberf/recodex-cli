@@ -20,19 +20,23 @@ def cli():
 
 @cli.command()
 @click.option("--json/--yaml", "useJson", default=None)
+@click.option("--offset", "-o", type=int, default=0)
+@click.option("--limit", "-l", type=int, default=0)
+@click.option("--order", default=None)
+@click.option("--locale", default='en')
 @pass_api_client
-def list_all(api: ApiClient, useJson):
+def list_all(api: ApiClient, useJson, offset, limit, order, locale):
     """
     List all exercises (as ID and name) in JSON, Yaml, or as a plain list.
     """
-    exercises = api.get_exercises()
+    exercises = api.get_exercises(offset, limit, order, locale)
     if useJson is True:
         json.dump(exercises, sys.stdout, sort_keys=True, indent=4)
     elif useJson is False:
         yaml.dump(exercises, sys.stdout)
     else:
         for exercise in exercises:
-            click.echo("{} {}".format(exercise["id"], exercise["name"]))
+            click.echo("{}\t{}".format(exercise["id"], exercise["name"]))
 
 
 @cli.command()
@@ -88,7 +92,8 @@ def get_ref_solution_evaluations(api: ApiClient, ref_solution_id, useJson):
         for evaluation in evaluations:
             ts = int(evaluation["submittedAt"])
             date = datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-            click.echo("{} {} {} {}".format(evaluation["id"], evaluation["evaluationStatus"], evaluation["isCorrect"], date))
+            click.echo("{} {} {} {}".format(evaluation["id"],
+                       evaluation["evaluationStatus"], evaluation["isCorrect"], date))
 
 
 @cli.command()

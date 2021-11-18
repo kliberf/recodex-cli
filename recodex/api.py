@@ -1,6 +1,7 @@
 import requests
 from json import JSONDecodeError
 import logging
+import urllib
 
 
 class ApiClient:
@@ -53,8 +54,13 @@ class ApiClient:
     def get_exercise(self, exercise_id):
         return self.get("/exercises/{}".format(exercise_id))
 
-    def get_exercises(self, offset=0, limit=0):
-        return self.get("/exercises?offset={}&limit={}".format(offset, limit))["items"]
+    def get_exercises(self, offset=0, limit=0, orderBy=None, locale=None):
+        url = "/exercises?offset={}&limit={}".format(offset, limit)
+        if orderBy is not None:
+            url += "&orderBy={}".format(urllib.parse.quote_plus(orderBy))
+        if locale is not None:
+            url += "&locale={}".format(urllib.parse.quote_plus(locale))
+        return self.get(url)["items"]
 
     def get_reference_solutions(self, exercise_id):
         return self.get("/reference-solutions/exercise/{}".format(exercise_id))
