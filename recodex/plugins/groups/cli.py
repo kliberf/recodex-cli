@@ -6,6 +6,7 @@ import click
 
 from recodex.api import ApiClient
 from recodex.decorators import pass_api_client
+from recodex.utils import get_localized_name
 
 
 @click.group()
@@ -13,6 +14,22 @@ def cli():
     """
     Tools for groups manipulation
     """
+
+
+@cli.command()
+@click.argument("group_id")
+@click.option("--json/--yaml", "useJson", default=False)
+@pass_api_client
+def detail(api: ApiClient, group_id, useJson):
+    """
+    Read detailed data about given group
+    """
+
+    group = api.get_group(group_id)
+    if useJson is True:
+        json.dump(group, sys.stdout, sort_keys=True, indent=4)
+    elif useJson is False:
+        yaml.dump(group, sys.stdout)
 
 
 @cli.command()
@@ -69,7 +86,7 @@ def detach(api: ApiClient, group_id, exercise_id):
 @pass_api_client
 def students(api: ApiClient, group_id, useJson):
     """
-    Detach exercise from a group of residence
+    List all students of a group.
     """
 
     students = api.get_group_students(group_id)
@@ -80,3 +97,22 @@ def students(api: ApiClient, group_id, useJson):
     else:
         for student in students:
             click.echo("{} {}".format(student["id"], student["fullName"]))
+
+
+@cli.command()
+@click.argument("group_id")
+@click.option("--json/--yaml", "useJson", default=None)
+@pass_api_client
+def assignments(api: ApiClient, group_id, useJson):
+    """
+    List all (regular) assignments of a group.
+    """
+
+    assignments = api.get_group_assignments(group_id)
+    if useJson is True:
+        json.dump(assignments, sys.stdout, sort_keys=True, indent=4)
+    elif useJson is False:
+        yaml.dump(assignments, sys.stdout)
+    else:
+        for assignment in assignments:
+            click.echo("{} {}".format(assignment["id"], get_localized_name(assignment["localizedTexts"])))

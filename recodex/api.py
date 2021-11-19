@@ -198,7 +198,16 @@ class ApiClient:
     def set_allow_user(self, user_id, allow):
         return self.post("/users/{}/allowed".format(user_id), data={"isAllowed": allow})
 
+    def get_users_list(self, user_ids):
+        return self.post("/users/list", data={"ids": user_ids})
+
     # Groups
+
+    def get_group(self, group_id):
+        return self.get("/groups/{}".format(group_id))
+
+    def get_group_assignments(self, group_id):
+        return self.get("/groups/{}/assignments".format(group_id))
 
     def group_add_student(self, group_id, user_id):
         return self.post("/groups/{}/students/{}".format(group_id, user_id))
@@ -264,7 +273,10 @@ class ApiClient:
     # Misc
 
     def get_group_students(self, group_id):
-        return self.get("/groups/{}/students".format(group_id))
+        group = self.get_group(group_id)
+        if (group is None or "privateData" not in group or group["privateData"] is None):
+            return []
+        return self.get_users_list(group["privateData"]["students"])
 
     def get_user_solutions(self, assignment_id, user_id):
         return self.get("/exercise-assignments/{}/users/{}/solutions".format(assignment_id, user_id))

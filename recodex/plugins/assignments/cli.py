@@ -1,5 +1,4 @@
 import click
-import unicodedata
 import sys
 import os
 import datetime
@@ -8,10 +7,7 @@ from ruamel import yaml
 
 from recodex.api import ApiClient
 from recodex.decorators import pass_api_client
-
-
-def asciiize_string(str):
-    return unicodedata.normalize('NFKD', str).encode('ascii', 'ignore').decode('utf-8')
+from recodex.utils import asciiize_string
 
 
 def safe_get_solution_points(solution):
@@ -78,7 +74,7 @@ def download_best_solutions(api: ApiClient, download_dir, assignment_id):
                 asciiize_string(student["name"]["lastName"]),
                 asciiize_string(student["name"]["firstName"]), student["id"])
             points = safe_get_solution_points(best)
-            created = datetime.datetime.fromtimestamp(best["solution"]["createdAt"]).strftime('%Y-%m-%d %H:%M:%S')
+            created = datetime.datetime.fromtimestamp(best["createdAt"]).strftime('%Y-%m-%d %H:%M:%S')
             click.echo("Saving {} ... {} points, {}".format(file_name, points, created))
             api.download_solution(best['id'], "{}/{}".format(download_dir, file_name))
 
@@ -105,4 +101,5 @@ def get_solutions(api: ApiClient, assignment_id, useJson):
             if (solution["isBestSolution"]):
                 flags.append("best")
             points = solution["overriddenPoints"] if solution["overriddenPoints"] else solution["actualPoints"]
-            click.echo("{} {} {}+{}/{} {}".format(solution["id"], solution["solution"]["userId"], points, solution["bonusPoints"], solution["maxPoints"], ", ".join(flags)))
+            click.echo("{} {} {}+{}/{} {}".format(solution["id"], solution["authorId"],
+                       points, solution["bonusPoints"], solution["maxPoints"], ", ".join(flags)))
