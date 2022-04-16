@@ -1,6 +1,8 @@
 import click
 import csv
 import sys
+import json
+from ruamel import yaml
 
 from recodex.api import ApiClient
 from recodex.config import UserContext
@@ -23,6 +25,21 @@ def format_user_csv(user):
         'title_after': user['name']['degreesAfterName'],
         'avatar_url': user['avatarUrl'],
     }
+
+
+@cli.command()
+@click.argument("user_id")
+@click.option("--json/--yaml", "useJson", default=True)
+@pass_api_client
+def get(api: ApiClient, user_id, useJson):
+    """
+    Get user data and print it in JSON or Yaml.
+    """
+    user = api.get_user(user_id)
+    if useJson:
+        json.dump(user, sys.stdout, sort_keys=True, indent=4)
+    else:
+        yaml.dump(user, sys.stdout)
 
 
 @cli.command()

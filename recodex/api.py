@@ -203,6 +203,9 @@ class ApiClient:
 
     # Groups
 
+    def get_all_groups(self):
+        return self.get("/groups")
+
     def get_group(self, group_id):
         return self.get("/groups/{}".format(group_id))
 

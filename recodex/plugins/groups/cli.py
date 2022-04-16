@@ -17,6 +17,21 @@ def cli():
 
 
 @cli.command()
+@click.option("--json/--yaml", "useJson", default=False)
+@pass_api_client
+def all(api: ApiClient, useJson):
+    """
+    Return all groups (visible to the user)
+    """
+
+    groups = api.get_all_groups()
+    if useJson is True:
+        json.dump(groups, sys.stdout, sort_keys=True, indent=4)
+    elif useJson is False:
+        yaml.dump(groups, sys.stdout)
+
+
+@cli.command()
 @click.argument("group_id")
 @click.option("--json/--yaml", "useJson", default=False)
 @pass_api_client
