@@ -238,6 +238,15 @@ class ApiClient:
     def get_solution_comments(self, solution_id):
         return self.get("/comments/{}".format(solution_id))
 
+    def add_solution_comment(self, solution_id, comment, is_private=False):
+        return self.post("/comments/{}".format(solution_id), data={"text": comment, "isPrivate": is_private})
+
+    def delete_solution_comment(self, solution_id, comment_id):
+        return self.delete("/comments/{}/comment/{}".format(solution_id, comment_id))
+
+    def solution_comment_set_private(self, solution_id, comment_id, is_private):
+        return self.post("/comments/{}/comment/{}/private".format(solution_id, comment_id), data={"isPrivate": is_private})
+
     def solution_set_bonus_points(self, solution_id, bonus_points, override):
         return self.post("assignment-solutions/{}/bonus-points".format(solution_id), data={"overriddenPoints": override, "bonusPoints": bonus_points})
 

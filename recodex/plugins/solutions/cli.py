@@ -45,9 +45,45 @@ def get_comments(api: ApiClient, solution_id, useJson):
     else:
         for comment in comments["comments"]:
             posted = datetime.datetime.fromtimestamp(comment["postedAt"]).strftime('%Y-%m-%d %H:%M:%S')
-            click.echo("\n>>> {} at {} ({}) [{}]:".format(comment["user"]["name"], posted, "private" if comment["isPrivate"] else "public", comment["id"]))
+            click.echo("\n>>> {} at {} ({}) [{}]:".format(comment["user"]["name"],
+                       posted, "private" if comment["isPrivate"] else "public", comment["id"]))
             click.echo(comment["text"])
             click.echo("\n-----")
+
+
+@cli.command()
+@click.argument("solution_id")
+@click.argument("text")
+@click.option("--private", "is_private", default=False)
+@pass_api_client
+def add_comment(api: ApiClient, solution_id, text, is_private):
+    """
+    Add new comment into a thread related to given solution.
+    """
+    api.add_solution_comment(solution_id, text, is_private)
+
+
+@cli.command()
+@click.argument("solution_id")
+@click.argument("comment_id")
+@pass_api_client
+def delete_comment(api: ApiClient, solution_id, comment_id):
+    """
+    Delete a comment from a thread related to given solution.
+    """
+    api.delete_solution_comment(solution_id, comment_id)
+
+
+@cli.command()
+@click.argument("solution_id")
+@click.argument("comment_id")
+@click.option("--private/--public", "is_private", default=True)
+@pass_api_client
+def comment_set_private(api: ApiClient, solution_id, comment_id, is_private):
+    """
+    Set the private flag of a comment from a thread related to given solution.
+    """
+    api.solution_comment_set_private(solution_id, comment_id, is_private)
 
 
 @cli.command()
