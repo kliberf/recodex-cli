@@ -18,13 +18,14 @@ def cli():
 
 @cli.command()
 @click.option("--json/--yaml", "useJson", default=False)
+@click.option("--archived", is_flag=True)
 @pass_api_client
-def all(api: ApiClient, useJson):
+def all(api: ApiClient, useJson, archived):
     """
     Return all groups (visible to the user)
     """
 
-    groups = api.get_all_groups()
+    groups = api.get_all_groups(archived)
     if useJson is True:
         json.dump(groups, sys.stdout, sort_keys=True, indent=4)
     elif useJson is False:
