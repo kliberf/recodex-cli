@@ -247,6 +247,12 @@ class ApiClient:
     def solution_comment_set_private(self, solution_id, comment_id, is_private):
         return self.post("/comments/{}/comment/{}/private".format(solution_id, comment_id), data={"isPrivate": is_private})
 
+    def get_assignment_solution(self, solution_id):
+        return self.get("assignment-solutions/{}".format(solution_id))
+
+    def get_assignment_solution_files(self, solution_id):
+        return self.get("assignment-solutions/{}/files".format(solution_id))
+
     def solution_set_bonus_points(self, solution_id, bonus_points, override):
         return self.post("assignment-solutions/{}/bonus-points".format(solution_id), data={"overriddenPoints": override, "bonusPoints": bonus_points})
 
@@ -281,6 +287,17 @@ class ApiClient:
 
     def delete_shadow_assignment_points(self, points_id):
         return self.delete("/shadow-assignments/points/{}".format(points_id))
+
+    # Plagiarisms
+
+    def create_plagiarism_batch(self, tool, tool_params=None):
+        self.post('/plagiarism', data={"detectionTool": tool, "detectionToolParams": tool_params})
+
+    def update_plagiarism_batch(self, id, upload_completed):
+        self.post('/plagiarism/{}'.format(id), data={"uploadCompleted": upload_completed})
+
+    def add_plagiarism_detected_similarity(self, id, solution_id, data):
+        self.post('/plagiarism/{}/{}'.format(id, solution_id), data=data)
 
     # Misc
 

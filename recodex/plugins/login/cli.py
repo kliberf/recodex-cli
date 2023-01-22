@@ -22,3 +22,15 @@ def login(data_dir: Path, api_url):
 
     api_token = api_login_response["accessToken"]
     UserContext(api_url, api_token).store(data_dir / "context.yaml")
+
+
+@click.command()
+@click.argument("api_url")
+@click.argument("token")
+@pass_data_dir
+def set_token(data_dir: Path, api_url, token):
+    """
+    Manually set an access token (e.g., taken from the UI as a string)
+    """
+
+    UserContext(api_url, token).store(data_dir / "context.yaml")

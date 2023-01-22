@@ -3,6 +3,7 @@ import sys
 import json
 from ruamel import yaml
 import datetime
+import pprint
 
 from recodex.api import ApiClient
 from recodex.decorators import pass_api_client
@@ -17,6 +18,25 @@ def cli():
 
 @cli.command()
 @click.argument("solution_id")
+@click.option("--json/--yaml", "useJson", default=None)
+@pass_api_client
+def detail(api: ApiClient, solution_id, useJson):
+    """
+    Get solution detail (structured data).
+    """
+
+    solution = api.get_assignment_solution(solution_id)
+    if useJson is True:
+        json.dump(solution, sys.stdout, sort_keys=True, indent=4)
+    elif useJson is False:
+        yaml.dump(solution, sys.stdout)
+    else:
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(solution)
+
+
+@cli.command()
+@click.argument("solution_id")
 @click.argument("download_as")
 @pass_api_client
 def download(api: ApiClient, solution_id, download_as):
@@ -25,6 +45,25 @@ def download(api: ApiClient, solution_id, download_as):
     """
 
     api.download_solution(solution_id, download_as)
+
+
+@cli.command()
+@click.argument("solution_id")
+@click.option("--json/--yaml", "useJson", default=None)
+@pass_api_client
+def get_files(api: ApiClient, solution_id, useJson):
+    """
+    Get all solution (submitted) files metadata.
+    """
+
+    files = api.get_assignment_solution_files(solution_id)
+    if useJson is True:
+        json.dump(files, sys.stdout, sort_keys=True, indent=4)
+    elif useJson is False:
+        yaml.dump(files, sys.stdout)
+    else:
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(files)
 
 
 @cli.command()
