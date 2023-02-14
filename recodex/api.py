@@ -291,13 +291,13 @@ class ApiClient:
     # Plagiarisms
 
     def create_plagiarism_batch(self, tool, tool_params=None):
-        self.post('/plagiarism', data={"detectionTool": tool, "detectionToolParams": tool_params})
+        return self.post('/plagiarism', data={"detectionTool": tool, "detectionToolParams": tool_params})
 
     def update_plagiarism_batch(self, id, upload_completed):
-        self.post('/plagiarism/{}'.format(id), data={"uploadCompleted": upload_completed})
+        return self.post('/plagiarism/{}'.format(id), data={"uploadCompleted": upload_completed})
 
     def add_plagiarism_detected_similarity(self, id, solution_id, data):
-        self.post('/plagiarism/{}/{}'.format(id, solution_id), data=data)
+        return self.post('/plagiarism/{}/{}'.format(id, solution_id), data=data)
 
     # Misc
 

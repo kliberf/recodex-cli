@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='recodex-cli',
-    version='0.0.18',
+    version='0.0.19',
     description='ReCodEx CLI',
     long_description='A command line frontend to the ReCodEx programmer evaluation system',
     classifiers=[
@@ -34,11 +34,12 @@ setup(
                 'groups = recodex.plugins.groups.cli:cli',
                 'caslogin = recodex.plugins.caslogin.cli:caslogin',
                 'login = recodex.plugins.login.cli:login',
+                'set_token = recodex.plugins.login.cli:set_token',
+                'plagiarisms = recodex.plugins.plagiarisms.cli:cli',
                 'shadow_assignments = recodex.plugins.shadow_assignments.cli:cli',
                 'solutions = recodex.plugins.solutions.cli:cli',
                 'takeover = recodex.plugins.takeover.cli:takeover',
                 'users = recodex.plugins.users.cli:cli',
-                'plagiarisms = recodex.plugins.plagiarisms.cli:cli',
             ]
     }
 )
