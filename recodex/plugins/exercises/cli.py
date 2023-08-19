@@ -261,6 +261,39 @@ def set_config(api: ApiClient, exercise_id, file_name, useJson):
 
 
 @cli.command()
+@click.argument("exercise_id")
+@click.option("--excavate/--archive", "excavate", default=False)
+@pass_api_client
+def set_archived(api: ApiClient, exercise_id, excavate):
+    """
+    Set the archived flag of an exercise (put it into archived mode or excavate from archive).
+    """
+    api.set_exercise_archived(exercise_id, not excavate)
+
+
+@cli.command()
+@click.argument("exercise_id")
+@click.argument("author")
+@pass_api_client
+def set_author(api: ApiClient, exercise_id, author):
+    """
+    Change the author of the exercise.
+    """
+    api.set_exercise_author(exercise_id, author)
+
+
+@cli.command()
+@click.argument("exercise_id")
+@click.option('--admin', '-a', multiple=True)
+@pass_api_client
+def set_admins(api: ApiClient, exercise_id, admin):
+    """
+    Set exercise admins (replaces current list of admins).
+    """
+    api.set_exercise_admins(exercise_id, admin)
+
+
+@cli.command()
 @click.option('--stats', is_flag=True)
 @pass_api_client
 def tags_get_all(api: ApiClient, stats):
@@ -321,3 +354,14 @@ def tags_remove_global(api: ApiClient, tag):
     """
     res = api.exercise_tags_remove_global(tag)
     click.echo("{} exercise(s) affected".format(res["count"]))
+
+
+@cli.command()
+@click.argument("ref_solution_id")
+@click.argument("visibility")
+@pass_api_client
+def set_ref_solution_visibility(api: ApiClient, ref_solution_id, visibility):
+    """
+    Change visibility of a reference solution.
+    """
+    api.update_reference_solution_visibility(ref_solution_id, int(visibility))

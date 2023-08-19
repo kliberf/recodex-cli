@@ -97,8 +97,22 @@ class ApiClient:
     def update_exercise(self, exercise_id, details):
         self.post('/exercises/{}'.format(exercise_id), data=details)
 
+    def set_exercise_archived(self, exercise_id, archived):
+        self.post('/exercises/{}/archived'.format(exercise_id), data={"archived": archived})
+
+    def set_exercise_author(self, exercise_id, author):
+        self.post('/exercises/{}/author'.format(exercise_id), data={"author": author})
+
+    def set_exercise_admins(self, exercise_id, admins_ids):
+        self.post('/exercises/{}/admins'.format(exercise_id), data={"admins": admins_ids})
+
     def delete_exercise(self, exercise_id):
         self.delete('/exercises/{}'.format(exercise_id))
+
+    def update_reference_solution_visibility(self, solution_id, visibility):
+        self.post('/reference-solutions/{}/visibility'.format(solution_id), data={
+            "visibility": visibility
+        })
 
     def delete_reference_solution_evaluation(self, evaluation_id):
         self.delete('/reference-solutions/evaluation/{}'.format(evaluation_id))
