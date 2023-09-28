@@ -69,7 +69,7 @@ def get_ref_solutions(api: ApiClient, exercise_id, useJson):
         yaml.dump(solutions, sys.stdout)
     else:
         for solution in solutions:
-            ts = int(solution["solution"]["createdAt"])
+            ts = int(solution["createdAt"])
             date = datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
             click.echo("{} {} {} {}".format(solution["id"], solution["runtimeEnvironmentId"],
                                             date, solution["description"]))
@@ -160,12 +160,13 @@ def add_localization(api: ApiClient, locale, exercise_id, include_name):
 @click.option("runtime_environment", "-r", required=True)
 @pass_api_client
 def add_reference_solution(api: ApiClient, exercise_id, note, runtime_environment, files):
-    solution = api.create_reference_solution(exercise_id, {
+    uploaded_files = [api.upload_file(file, open(file, "r"))["id"] for file in files]
+    result = api.create_reference_solution(exercise_id, {
         "note": note,
         "runtimeEnvironmentId": runtime_environment,
-        "files": [api.upload_file(file, open(file, "r")) for file in files]
+        "files": uploaded_files
     })
-    click.echo(solution["id"])
+    click.echo(result["referenceSolution"]["id"])
 
 
 @cli.command()
