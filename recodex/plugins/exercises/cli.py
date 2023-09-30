@@ -3,6 +3,7 @@ from ruamel import yaml
 import logging
 import sys
 import io
+import os
 from datetime import datetime, timedelta
 
 import click
@@ -157,15 +158,39 @@ def add_localization(api: ApiClient, locale, exercise_id, include_name):
 @click.argument("files", nargs=-1)
 @click.option("exercise_id", "-e")
 @click.option("note", "-n", default="")
-@click.option("runtime_environment", "-r", required=True)
+@click.option("runtime_environment", "-r", default=None)
 @pass_api_client
 def add_reference_solution(api: ApiClient, exercise_id, note, runtime_environment, files):
+    if len(files) == 0:
+        print('No files given.', file=sys.stderr)
+        return
+
     uploaded_files = [api.upload_file(file, open(file, "r"))["id"] for file in files]
-    result = api.create_reference_solution(exercise_id, {
+
+    preflight = api.presubmit_check(exercise_id, uploaded_files)
+    if (preflight["environments"] is None or len(preflight["environments"]) == 0):
+        print('No valid environments found for given files.', file=sys.stderr)
+        return
+
+    if runtime_environment is None:
+        runtime_environment = preflight["environments"][0]
+
+    if runtime_environment not in preflight["environments"]:
+        print('Selected runtime {} is not allowed by the preflight check.'.format(runtime_environment), file=sys.stderr)
+        return
+
+    submit_data = {
         "note": note,
         "runtimeEnvironmentId": runtime_environment,
         "files": uploaded_files
-    })
+    }
+    variables = next((sv for sv in preflight['submitVariables'] if sv.get(
+        "runtimeEnvironmentId") == runtime_environment), {}).get('variables', [])
+    entry_point = next((v for v in variables if v.get('name') == 'entry-point'), None)
+    if entry_point is not None:
+        submit_data["solutionParams"] = {"variables": [{"name": "entry-point", "value": os.path.basename(files[0])}]}
+
+    result = api.create_reference_solution(exercise_id, submit_data)
     click.echo(result["referenceSolution"]["id"])
 
 

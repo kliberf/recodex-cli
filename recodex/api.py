@@ -117,6 +117,9 @@ class ApiClient:
     def delete_reference_solution_evaluation(self, evaluation_id):
         self.delete('/reference-solutions/evaluation/{}'.format(evaluation_id))
 
+    def presubmit_check(self, exercise_id, files):
+        return self.post('/reference-solutions/exercise/{}/pre-submit'.format(exercise_id), data={"files": files})
+
     def create_reference_solution(self, exercise_id, data):
         return self.post('/reference-solutions/exercise/{}/submit'.format(exercise_id), data=data)
 
