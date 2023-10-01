@@ -123,6 +123,9 @@ class ApiClient:
     def create_reference_solution(self, exercise_id, data):
         return self.post('/reference-solutions/exercise/{}/submit'.format(exercise_id), data=data)
 
+    def delete_reference_solution(self, solution_id):
+        self.delete('/reference-solutions/{}'.format(solution_id))
+
     def update_environment_configs(self, exercise_id, configs):
         self.post("/exercises/{}/environment-configs".format(exercise_id), data={
             "environmentConfigs": configs

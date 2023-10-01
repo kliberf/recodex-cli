@@ -98,6 +98,16 @@ def get_ref_solution_evaluations(api: ApiClient, ref_solution_id, useJson):
 
 
 @cli.command()
+@click.argument("solution_id")
+@pass_api_client
+def delete_ref_solution(api: ApiClient, solution_id):
+    """
+    Delete referenece solution and including all its evaluations.
+    """
+    api.delete_reference_solution(solution_id)
+
+
+@cli.command()
 @click.argument("evaluation_id")
 @pass_api_client
 def delete_ref_solution_evaluation(api: ApiClient, evaluation_id):
