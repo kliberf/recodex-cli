@@ -19,10 +19,10 @@ def cli():
 def format_user_csv(user):
     return {
         'id': user['id'],
-        'title_before': user['name']['degreesBeforeName'],
+        'title_before': user['name']['titlesBeforeName'],
         'first_name': user['name']['firstName'],
         'last_name': user['name']['lastName'],
-        'title_after': user['name']['degreesAfterName'],
+        'title_after': user['name']['titlesAfterName'],
         'avatar_url': user['avatarUrl'],
     }
 
@@ -43,27 +43,38 @@ def get(api: ApiClient, user_id, useJson):
 
 
 @cli.command()
-@click.argument("search_string")
-@click.option('--csv', 'as_csv', is_flag=True, help='Return full records formated into CSV.')
+@click.option("--json/--yaml", "useJson", default=None, help='Default is CSV.')
+@click.option('--only-active', 'onlyActive', is_flag=True, help='Return full records formated into CSV.')
+@click.option("search", "-s", default=None, help="Roles split by comma")
+@click.option("roles", "-r", default=None, help="Roles split by comma")
 @pass_user_context
 @pass_api_client
-def search(api: ApiClient, context: UserContext, search_string, as_csv):
+def search(api: ApiClient, context: UserContext, search, roles, useJson, onlyActive):
     """
     Search for a user
     """
+    if roles is not None:
+        roles = roles.split(',')
 
-    if as_csv:
+    users = []
+    instances_ids = api.get_user(context.user_id)["privateData"]["instancesIds"]
+    for instance_id in instances_ids:
+        for user in api.search_users(instance_id, search, roles):
+            if not onlyActive or user.get("privateData", {}).get("isAllowed", False):
+                users.append(user)
+
+    if useJson is True:
+        json.dump(users, sys.stdout, sort_keys=True, indent=4)
+    elif useJson is False:
+        yaml.dump(users, sys.stdout)
+    else:
+        # print CSV header
         fieldnames = ['id', 'title_before', 'first_name', 'last_name', 'title_after', 'avatar_url']
         csv_writer = csv.DictWriter(sys.stdout, fieldnames=fieldnames)
         csv_writer.writeheader()
 
-    instances_ids = api.get_user(context.user_id)["privateData"]["instancesIds"]
-    for instance_id in instances_ids:
-        for user in api.search_users(instance_id, search_string):
-            if as_csv:
-                csv_writer.writerow(format_user_csv(user))
-            else:
-                click.echo("{} {}".format(user["fullName"], user["id"]))
+        for user in users:
+            csv_writer.writerow(format_user_csv(user))
 
 
 @cli.command()

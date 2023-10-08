@@ -68,6 +68,9 @@ class ApiClient:
     def get_reference_solution_evaluations(self, solution_id):
         return self.get("/reference-solutions/{}/submissions".format(solution_id))
 
+    def get_reference_solution_files(self, solution_id):
+        return self.get("/reference-solutions/{}/files".format(solution_id))
+
     def upload_file(self, filename, stream):
         return self.post("/uploaded-files", files={"file": (filename, stream)})
 
@@ -76,6 +79,11 @@ class ApiClient:
 
     def create_exercise(self, group_id):
         return self.post("/exercises", data={
+            "groupId": group_id
+        })
+
+    def fork_exercise(self, exercise_id, group_id):
+        return self.post("/exercises/{}/fork".format(exercise_id), data={
             "groupId": group_id
         })
 
@@ -199,8 +207,14 @@ class ApiClient:
     def update_user(self, user_id, user_data):
         return self.post("/users/{}".format(user_id), data=user_data)
 
-    def search_users(self, instance_id, search_string):
-        return self.get("/users/?filters[instanceId]={}&filters[search]={}".format(instance_id, search_string))["items"]
+    def search_users(self, instance_id, search_string=None, roles=None):
+        query = "/users/?filters[instanceId]={}".format(instance_id)
+        if search_string is not None:
+            query += "&filters[search]={}".format(search_string)
+        if roles is not None:
+            for role in roles:
+                query += "&filters[roles][]={}".format(role)
+        return self.get(query)["items"]
 
     def register_user(self, instance_id, email, first_name, last_name, password):
         return self.post("/users", data={
@@ -329,6 +343,9 @@ class ApiClient:
 
     def get_user_solutions(self, assignment_id, user_id):
         return self.get("/exercise-assignments/{}/users/{}/solutions".format(assignment_id, user_id))
+
+    def download_file(self, file_id, file_name):
+        return self.download("/uploaded-files/{}/download".format(file_id), file_name)
 
     def download_solution(self, solution_id, file_name):
         return self.download("/assignment-solutions/{}/download-solution".format(solution_id), file_name)

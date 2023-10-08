@@ -5,6 +5,8 @@ import sys
 import io
 import os
 from datetime import datetime, timedelta
+from tempfile import mkdtemp
+import shutil
 
 import click
 
@@ -164,17 +166,7 @@ def add_localization(api: ApiClient, locale, exercise_id, include_name):
     api.update_exercise(exercise_id, exercise)
 
 
-@cli.command()
-@click.argument("files", nargs=-1)
-@click.option("exercise_id", "-e")
-@click.option("note", "-n", default="")
-@click.option("runtime_environment", "-r", default=None)
-@pass_api_client
-def add_reference_solution(api: ApiClient, exercise_id, note, runtime_environment, files):
-    if len(files) == 0:
-        print('No files given.', file=sys.stderr)
-        return
-
+def _add_reference_solution(api: ApiClient, exercise_id, note, runtime_environment, files):
     uploaded_files = [api.upload_file(file, open(file, "r"))["id"] for file in files]
 
     preflight = api.presubmit_check(exercise_id, uploaded_files)
@@ -200,7 +192,20 @@ def add_reference_solution(api: ApiClient, exercise_id, note, runtime_environmen
     if entry_point is not None:
         submit_data["solutionParams"] = {"variables": [{"name": "entry-point", "value": os.path.basename(files[0])}]}
 
-    result = api.create_reference_solution(exercise_id, submit_data)
+    return api.create_reference_solution(exercise_id, submit_data)
+
+
+@cli.command()
+@click.argument("files", nargs=-1)
+@click.option("exercise_id", "-e", help="Exercise ID")
+@click.option("note", "-n", default="", help="Note associated with the solution")
+@click.option("runtime_environment", "-r", default=None, help="Runtime environment ID")
+@pass_api_client
+def add_reference_solution(api: ApiClient, exercise_id, note, runtime_environment, files):
+    if len(files) == 0:
+        print('No files given.', file=sys.stderr)
+        return
+    result = _add_reference_solution(api, exercise_id, note, runtime_environment, files)
     click.echo(result["referenceSolution"]["id"])
 
 
@@ -401,3 +406,55 @@ def set_ref_solution_visibility(api: ApiClient, ref_solution_id, visibility):
     Change visibility of a reference solution.
     """
     api.update_reference_solution_visibility(ref_solution_id, int(visibility))
+
+
+@cli.command()
+@click.argument("exercise_id")
+@click.argument("group_id")
+@click.option('--complete', is_flag=True)
+@pass_api_client
+def fork(api: ApiClient, exercise_id, group_id, complete):
+    """
+    Copy (fork) given exercise and make the copy resident in specified group.
+    If complete flag is present, the (public) ref. solutions is copied as well.
+    """
+    res = api.fork_exercise(exercise_id, group_id)
+    new_id = res["id"]
+
+    if complete:
+        # reference solutions must be copied one by one
+        solutions = api.get_reference_solutions(exercise_id)
+        for solution in solutions:
+            if solution["visibility"] <= 0:
+                continue  # only public solutions are copied
+
+            # we need to list and download files first
+            files = api.get_reference_solution_files(solution["id"])
+            file_names = []
+            entry_point = None
+            tmpdir = mkdtemp()  # into a temporary directory
+            if not tmpdir:
+                raise Exception("Unable to create a temporary directory.")
+
+            for file in files:
+                if not file["name"]:
+                    continue
+                path = tmpdir + '/' + file["name"]
+                if file.get("isEntryPoint", False):
+                    entry_point = path
+                else:
+                    file_names.append(path)
+                api.download_file(file["id"], path)
+
+            if entry_point is not None:
+                file_names.insert(0, entry_point)  # make sure entry point is the first file on the list
+
+            if len(file_names) > 0:
+                ref_res = _add_reference_solution(api, new_id, solution["description"],
+                                                  solution["runtimeEnvironmentId"], file_names)
+                api.update_reference_solution_visibility(
+                    ref_res["referenceSolution"]["id"], solution["visibility"])
+
+            shutil.rmtree(tmpdir)
+
+    click.echo(new_id)
