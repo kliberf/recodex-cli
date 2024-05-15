@@ -193,7 +193,7 @@ def add_localization(api: ApiClient, locale, exercise_id, include_name):
 
 
 def _add_reference_solution(api: ApiClient, exercise_id, note, runtime_environment, files):
-    uploaded_files = [api.upload_file(file, open(file, "r"))[
+    uploaded_files = [api.upload_file(file, open(file, "rb"))[
         "id"] for file in files]
 
     preflight = api.presubmit_check(exercise_id, uploaded_files)
@@ -329,7 +329,7 @@ def set_config(api: ApiClient, exercise_id, file_name, useJson):
     """
     Load a JSON or YAML from a file and set it as configuration.
     """
-    with open(file_name, 'r') as stream:
+    with open(file_name, 'r', encoding="utf-8") as stream:
         if useJson:
             config = json.load(stream)
         else:

@@ -91,13 +91,15 @@ class ApiClient:
         })
 
     def add_exercise_attachments(self, exercise_id, file_ids):
-        self.post("/exercises/{}/attachment-files".format(exercise_id), data={"files": file_ids})
+        self.post("/exercises/{}/attachment-files".format(exercise_id),
+                  data={"files": file_ids})
 
     def get_exercise_attachments(self, exercise_id):
         return self.get("/exercises/{}/attachment-files".format(exercise_id))
 
     def add_exercise_files(self, exercise_id, file_ids):
-        self.post("/exercises/{}/supplementary-files".format(exercise_id), data={"files": file_ids})
+        self.post("/exercises/{}/supplementary-files".format(exercise_id),
+                  data={"files": file_ids})
 
     def get_exercise_files(self, exercise_id):
         return self.get("/exercises/{}/supplementary-files".format(exercise_id))
@@ -109,13 +111,16 @@ class ApiClient:
         self.post('/exercises/{}'.format(exercise_id), data=details)
 
     def set_exercise_archived(self, exercise_id, archived):
-        self.post('/exercises/{}/archived'.format(exercise_id), data={"archived": archived})
+        self.post('/exercises/{}/archived'.format(exercise_id),
+                  data={"archived": archived})
 
     def set_exercise_author(self, exercise_id, author):
-        self.post('/exercises/{}/author'.format(exercise_id), data={"author": author})
+        self.post('/exercises/{}/author'.format(exercise_id),
+                  data={"author": author})
 
     def set_exercise_admins(self, exercise_id, admins_ids):
-        self.post('/exercises/{}/admins'.format(exercise_id), data={"admins": admins_ids})
+        self.post('/exercises/{}/admins'.format(exercise_id),
+                  data={"admins": admins_ids})
 
     def delete_exercise(self, exercise_id):
         self.delete('/exercises/{}'.format(exercise_id))
@@ -146,10 +151,12 @@ class ApiClient:
         return self.get("/exercises/{}/config".format(exercise_id))
 
     def update_exercise_config(self, exercise_id, config):
-        self.post("/exercises/{}/config".format(exercise_id), data={"config": config})
+        self.post("/exercises/{}/config".format(exercise_id),
+                  data={"config": config})
 
     def set_exercise_tests(self, exercise_id, tests):
-        self.post("/exercises/{}/tests".format(exercise_id), data={"tests": tests})
+        self.post("/exercises/{}/tests".format(exercise_id),
+                  data={"tests": tests})
 
     def get_exercise_tests(self, exercise_id):
         return self.get("/exercises/{}/tests".format(exercise_id))
@@ -159,7 +166,8 @@ class ApiClient:
                   data={"limits": limits})
 
     def evaluate_reference_solutions(self, exercise_id):
-        self.post("/reference-solutions/exercise/{}/evaluate".format(exercise_id), data={})
+        self.post(
+            "/reference-solutions/exercise/{}/evaluate".format(exercise_id), data={})
 
     def resubmit_reference_solution(self, ref_solution_id, debug=False):
         return self.post("/reference-solutions/{}/resubmit".format(ref_solution_id), data={"debug": debug})
@@ -243,11 +251,17 @@ class ApiClient:
     def get_all_groups(self, archived=False):
         return self.get("/groups?{}".format('archived=1' if archived else ''))
 
+    def create_group(self, data):
+        return self.post("/groups/", data=data)
+
     def get_group(self, group_id):
         return self.get("/groups/{}".format(group_id))
 
     def get_group_assignments(self, group_id):
         return self.get("/groups/{}/assignments".format(group_id))
+
+    def get_group_shadow_assignments(self, group_id):
+        return self.get("/groups/{}/shadow-assignments".format(group_id))
 
     def group_add_student(self, group_id, user_id):
         return self.post("/groups/{}/students/{}".format(group_id, user_id))
@@ -256,10 +270,16 @@ class ApiClient:
         return self.delete("/groups/{}/students/{}".format(group_id, user_id))
 
     def group_attach_exercise(self, group_id, exercise_id):
-        return self.post("/exercises/{}/groups/{}".format(exercise_id, group_id))
+        return self.post("/exercises/{}/groups/{}"
+                         .format(exercise_id, group_id))
 
     def group_detach_exercise(self, group_id, exercise_id):
-        return self.delete("/exercises/{}/groups/{}".format(exercise_id, group_id))
+        return self.delete("/exercises/{}/groups/{}"
+                           .format(exercise_id, group_id))
+
+    def set_group_exam_flag(self, group_id, is_exam=True):
+        return self.post("/groups/{}/exam".format(group_id),
+                         data={"value": is_exam})
 
     # Assignments and related stuff...
 
@@ -304,18 +324,30 @@ class ApiClient:
 
     # Shadow Assignments
 
+    def create_shadow_assignment(self, group_id):
+        return self.post("/shadow-assignments/", data={
+            'groupId': group_id,
+        })
+
     def get_shadow_assignment(self, assignment_id):
         return self.get("/shadow-assignments/{}".format(assignment_id))
 
-    def create_shadow_assignment_points(self, assignment_id, user_id, points, note, awarded_at=None):
-        return self.post("/shadow-assignments/{}/create-points/".format(assignment_id), data={
-            'userId': user_id,
-            'points': points,
-            'note': note,
-            'awardedAt': awarded_at,
-        })
+    def update_shadow_assignment(self, assignment_id, data):
+        return self.post("/shadow-assignments/{}".format(assignment_id),
+                         data=data)
 
-    def update_shadow_assignment_points(self, points_id, points, note, awarded_at=None):
+    def create_shadow_assignment_points(self, assignment_id, user_id, points,
+                                        note, awarded_at=None):
+        return self.post("/shadow-assignments/{}/create-points/"
+                         .format(assignment_id), data={
+                             'userId': user_id,
+                             'points': points,
+                             'note': note,
+                             'awardedAt': awarded_at,
+                         })
+
+    def update_shadow_assignment_points(self, points_id, points, note,
+                                        awarded_at=None):
         return self.post("/shadow-assignments/points/{}".format(points_id), data={
             'points': points,
             'note': note,
@@ -358,11 +390,13 @@ class ApiClient:
         try:
             json = response.json()
         except JSONDecodeError:
-            logging.error("Loading JSON response failed, see full response below:")
+            logging.error(
+                "Loading JSON response failed, see full response below:")
             logging.error(response.text)
             raise RuntimeError("Loading JSON response failed")
 
         if not json["success"]:
-            raise RuntimeError("Received error from API: " + json["error"]["message"])
+            raise RuntimeError("Received error from API: " +
+                               json["error"]["message"])
 
         return json["payload"]

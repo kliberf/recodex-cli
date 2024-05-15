@@ -17,6 +17,18 @@ def cli():
 
 
 @cli.command()
+@click.argument("group_id")
+@pass_api_client
+def create(api: ApiClient, group_id):
+    """
+    Create new shadow assignment in a group
+    """
+
+    assignment = api.create_shadow_assignment(group_id)
+    click.echo(assignment["id"])
+
+
+@cli.command()
 @click.argument("assignment_id")
 @click.option("--json/--yaml", "useJson", default=None)
 @pass_api_client
@@ -39,6 +51,28 @@ def get(api: ApiClient, assignment_id, useJson):
         for points in assignment["points"]:
             click.echo("{} {} {}".format(
                 points["awardeeId"], points["points"], points["note"]))
+
+
+@cli.command()
+@click.argument("assignment_id")
+@pass_api_client
+def update(api: ApiClient, assignment_id):
+    """
+    Update shadow assignment (JSON with modifications must be given on stdin).
+    """
+
+    keys = ["version", "isPublic", "isBonus",
+            "localizedTexts", "maxPoints", "deadline"]
+
+    assignment = api.get_shadow_assignment(assignment_id)
+    to_update_input = sys.stdin.read().strip()
+    to_update = json.loads(to_update_input)
+
+    data = {"sendNotification": False}
+    for key in keys:
+        data[key] = to_update.get(key, assignment[key])
+
+    api.update_shadow_assignment(assignment_id, data)
 
 
 @cli.command()
