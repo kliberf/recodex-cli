@@ -196,7 +196,7 @@ def shadow_assignments(api: ApiClient, group_id, useJson):
 @click.argument("group_id")
 @click.option("--unset", is_flag=True)
 @pass_api_client
-def enable(api: ApiClient, group_id, unset):
+def set_exam(api: ApiClient, group_id, unset):
     """
     Set (or unset) exam flag of a group.
     """
