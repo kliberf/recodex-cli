@@ -281,6 +281,9 @@ class ApiClient:
         return self.post("/groups/{}/exam".format(group_id),
                          data={"value": is_exam})
 
+    def get_group_stats(self, group_id):
+        return self.get("/groups/{}/students/stats".format(group_id))
+
     # Assignments and related stuff...
 
     def get_assignment(self, assignment_id):

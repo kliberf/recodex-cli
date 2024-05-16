@@ -79,7 +79,7 @@ def detail(api: ApiClient, group_id, useJson):
         json.dump(group, sys.stdout, sort_keys=True, indent=4)
     elif useJson is False:
         yaml = YAML(typ="safe")
-    yaml.dump(group, sys.stdout)
+        yaml.dump(group, sys.stdout)
 
 
 @ cli.command()
@@ -202,3 +202,20 @@ def set_exam(api: ApiClient, group_id, unset):
     """
 
     api.set_group_exam_flag(group_id, not unset)
+
+
+@ cli.command()
+@ click.argument("group_id")
+@ click.option("--json/--yaml", "useJson", default=False)
+@ pass_api_client
+def stats(api: ApiClient, group_id, useJson):
+    """
+    Get students information about solution stats (point summaries)
+    """
+
+    stats = api.get_group_stats(group_id)
+    if useJson is True:
+        json.dump(stats, sys.stdout, sort_keys=True, indent=4)
+    elif useJson is False:
+        yaml = YAML(typ="safe")
+        yaml.dump(stats, sys.stdout)

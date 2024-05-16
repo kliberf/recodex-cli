@@ -44,6 +44,24 @@ def get(api: ApiClient, user_id, useJson):
 
 
 @cli.command()
+@click.option("--json/--yaml", "useJson", default=True)
+@pass_api_client
+def get_list(api: ApiClient, useJson):
+    """
+    Get data of multiple users, list of IDs is given on stdin (one ID per line)
+    """
+    ids = map(lambda id: id.strip(), sys.stdin.readlines())
+    ids = list(filter(lambda id: id, ids))
+
+    users = api.get_users_list(ids)
+    if useJson:
+        json.dump(users, sys.stdout, sort_keys=True, indent=4)
+    else:
+        yaml = YAML(typ="safe")
+        yaml.dump(users, sys.stdout)
+
+
+@cli.command()
 @click.option("--json/--yaml", "useJson", default=None, help='Default is CSV.')
 @click.option('--only-active', 'onlyActive', is_flag=True, help='Return full records formated into CSV.')
 @click.option("search", "-s", default=None, help="Substring to search")
