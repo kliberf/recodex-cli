@@ -65,10 +65,10 @@ def create(api: ApiClient, parent_id):
     click.echo(group['id'])
 
 
-@ cli.command()
-@ click.argument("group_id")
-@ click.option("--json/--yaml", "useJson", default=False)
-@ pass_api_client
+@cli.command()
+@click.argument("group_id")
+@click.option("--json/--yaml", "useJson", default=False)
+@pass_api_client
 def detail(api: ApiClient, group_id, useJson):
     """
     Read detailed data about given group
@@ -82,10 +82,10 @@ def detail(api: ApiClient, group_id, useJson):
         yaml.dump(group, sys.stdout)
 
 
-@ cli.command()
-@ click.argument("group_id")
-@ click.argument("user_id")
-@ pass_api_client
+@cli.command()
+@click.argument("group_id")
+@click.argument("user_id")
+@pass_api_client
 def join(api: ApiClient, group_id, user_id):
     """
     Add user as a member (student) of a group
@@ -93,22 +93,23 @@ def join(api: ApiClient, group_id, user_id):
 
     api.group_add_student(group_id, user_id)
 
-    @ cli.command()
-    @ click.argument("group_id")
-    @ click.argument("user_id")
-    @ pass_api_client
-    def leave(api: ApiClient, group_id, user_id):
-        """
+
+@cli.command()
+@click.argument("group_id")
+@click.argument("user_id")
+@pass_api_client
+def leave(api: ApiClient, group_id, user_id):
+    """
     Remove user (student) from a group
     """
 
     api.group_remove_student(group_id, user_id)
 
 
-@ cli.command()
-@ click.argument("group_id")
-@ click.argument("exercise_id")
-@ pass_api_client
+@cli.command()
+@click.argument("group_id")
+@click.argument("exercise_id")
+@pass_api_client
 def attach(api: ApiClient, group_id, exercise_id):
     """
     Attach exercise to a group of residence
@@ -116,22 +117,23 @@ def attach(api: ApiClient, group_id, exercise_id):
 
     api.group_attach_exercise(group_id, exercise_id)
 
-    @ cli.command()
-    @ click.argument("group_id")
-    @ click.argument("exercise_id")
-    @ pass_api_client
-    def detach(api: ApiClient, group_id, exercise_id):
-        """
+
+@cli.command()
+@click.argument("group_id")
+@click.argument("exercise_id")
+@pass_api_client
+def detach(api: ApiClient, group_id, exercise_id):
+    """
     Detach exercise from a group of residence
     """
 
     api.group_detach_exercise(group_id, exercise_id)
 
 
-@ cli.command()
-@ click.argument("group_id")
-@ click.option("--json/--yaml", "useJson", default=None)
-@ pass_api_client
+@cli.command()
+@click.argument("group_id")
+@click.option("--json/--yaml", "useJson", default=None)
+@pass_api_client
 def students(api: ApiClient, group_id, useJson):
     """
     List all students of a group.
@@ -148,10 +150,10 @@ def students(api: ApiClient, group_id, useJson):
             click.echo("{} {}".format(student["id"], student["fullName"]))
 
 
-@ cli.command()
-@ click.argument("group_id")
-@ click.option("--json/--yaml", "useJson", default=None)
-@ pass_api_client
+@cli.command()
+@click.argument("group_id")
+@click.option("--json/--yaml", "useJson", default=None)
+@pass_api_client
 def assignments(api: ApiClient, group_id, useJson):
     """
     List all (regular) assignments of a group.
@@ -170,10 +172,10 @@ def assignments(api: ApiClient, group_id, useJson):
                     assignment["localizedTexts"])))
 
 
-@ cli.command()
-@ click.argument("group_id")
-@ click.option("--json/--yaml", "useJson", default=None)
-@ pass_api_client
+@cli.command()
+@click.argument("group_id")
+@click.option("--json/--yaml", "useJson", default=None)
+@pass_api_client
 def shadow_assignments(api: ApiClient, group_id, useJson):
     """
     List all shadow assignments of a group.
@@ -204,10 +206,10 @@ def set_exam(api: ApiClient, group_id, unset):
     api.set_group_exam_flag(group_id, not unset)
 
 
-@ cli.command()
-@ click.argument("group_id")
-@ click.option("--json/--yaml", "useJson", default=False)
-@ pass_api_client
+@cli.command()
+@click.argument("group_id")
+@click.option("--json/--yaml", "useJson", default=False)
+@pass_api_client
 def stats(api: ApiClient, group_id, useJson):
     """
     Get students information about solution stats (point summaries)
