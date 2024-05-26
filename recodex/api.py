@@ -281,6 +281,14 @@ class ApiClient:
         return self.post("/groups/{}/exam".format(group_id),
                          data={"value": is_exam})
 
+    def set_group_exam_period(self, group_id, begin, end, strict=None):
+        data = {"end": end}
+        if begin is not None:
+            data["begin"] = begin
+        if strict is not None:
+            data["strict"] = strict
+        return self.post("/groups/{}/examPeriod".format(group_id), data=data)
+
     def get_group_stats(self, group_id):
         return self.get("/groups/{}/students/stats".format(group_id))
 

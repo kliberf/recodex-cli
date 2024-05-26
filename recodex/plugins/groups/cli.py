@@ -208,6 +208,25 @@ def set_exam(api: ApiClient, group_id, unset):
 
 @cli.command()
 @click.argument("group_id")
+@click.argument("begin")
+@click.argument("end")
+@click.option("--strict/--regular", default=None)
+@pass_api_client
+def set_exam_period(api: ApiClient, group_id, begin, end, strict):
+    """
+    Set/update exam period in a group. Begin/end are unix timestamps.
+    Begin may be ommitted (in case of update-only) by using '0' as value.
+    Strict/regular denotes the type of the user locks.
+    """
+    begin = int(begin)
+    if not begin:
+        begin = None
+    end = int(end)
+    api.set_group_exam_period(group_id, begin, end, strict)
+
+
+@cli.command()
+@click.argument("group_id")
 @click.option("--json/--yaml", "useJson", default=False)
 @pass_api_client
 def stats(api: ApiClient, group_id, useJson):
